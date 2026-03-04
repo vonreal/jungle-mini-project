@@ -31,6 +31,9 @@ class CustomJSONProvider(JSONProvider):
 
 app.json = CustomJSONProvider(app)
 
+# 파일 크기 제한 (10MB)
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
+
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
