@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>피드 상세 · 찍어봐, 오늘</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="phone">
+    <div class="app">
+      <header class="topbar">
+        <div class="top-actions" style="gap:6px">
+          <button class="pill" onclick="navBack('index.html')">←</button>
+        </div>
+        <div style="font-weight:900">피드 상세</div>
+        <div class="top-actions">
+          <button class="pill" id="detailMore">⋯</button>
+        </div>
+      </header>
+
+      <main class="main" style="padding-bottom:88px">
+        <div class="feed-head" id="dHead"></div>
+        <div class="feed-img" id="dImg"></div>
+        <div class="actions" id="dActions"></div>
+
+        <div style="margin-top:10px; color:var(--muted); font-size:12px; font-weight:900;">댓글</div>
+        <div id="dComments"></div>
+      </main>
+
+      <div class="commentbar" style="position:absolute; left:0; right:0; bottom:0;">
+        <input class="input" id="dCommentInput" placeholder="댓글을 남겨주세요!" />
+        <button class="send" id="dSend">↗</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/mock.js"></script>
+  <script>
+  function iconHeart(filled=false){
+    return filled
+      ? `<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`
+      : `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`;
+  }
+  function iconChat(){
+    return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+    </svg>`;
+  }
+  </script>
+  <script src="assets/js/feed_detail.js"></script>
+</body>
+</html>

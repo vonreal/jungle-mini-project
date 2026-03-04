@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>회원가입 · 찍어봐, 오늘</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="phone">
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="title">찍어봐, 오늘</div>
+          <div class="sub">회원가입</div>
+        </div>
+        <div class="top-actions">
+          <button class="pill" onclick="window.location.href='index.html'">닫기</button>
+        </div>
+      </header>
+
+      <main class="form">
+        <h1>찍어봐, 오늘</h1>
+
+        <div class="field">
+          <input class="input" id="username" placeholder="아이디" />
+        </div>
+        <div class="field">
+          <input class="input" id="password" type="password" placeholder="비밀번호" />
+        </div>
+        <div class="field">
+          <input class="input" id="password2" type="password" placeholder="비밀번호 확인" />
+        </div>
+        <div class="field">
+          <input class="input" id="nickname" placeholder="닉네임" />
+        </div>
+
+        <button class="btn primary" id="signupBtn">회원가입</button>
+
+        <div class="linkline" style="margin-top:14px;">
+          이미 계정이 있으신가요? <a href="login.html">로그인</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/mock.js"></script>
+  <script src="assets/js/signup.js"></script>
+</body>
+</html>

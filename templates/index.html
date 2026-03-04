@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>찍어봐, 오늘</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="phone">
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="title">찍어봐, 오늘</div>
+          <div class="sub" id="todayText"></div>
+        </div>
+        <div class="top-actions" id="topActions">
+     
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="mission">
+          <span class="day" id="dayPill">Day 1</span>
+          <h1 id="missionTitle">파란색을 찾아보자!</h1>
+          <div class="meta-row">
+            <span id="missionDate">2026.03.04 · 미션</span>
+            <span id="missionParticipants">+ 239명 참여중</span>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="tabs" id="tabs">
+            <div class="tab active" data-sort="latest">최신순</div>
+            <div class="tab" data-sort="likes">좋아요순</div>
+            <div class="tab" data-sort="comments">댓글 많은 순</div>
+          </div>
+
+          <div id="feedList"></div>
+        </section>
+      </main>
+
+      <button class="fab" id="fab" aria-label="피드 작성">
+        
+      </button>
+
+      <button class="fab-top" id="fabTop" aria-label="맨 위로">↑</button>
+
+      <div class="cta-login" id="loginCta">
+        <p>로그인하고 인증샷을 올려보세요</p>
+        <button class="mini" id="ctaGoLogin">로그인</button>
+      </div>
+</div>
+
+    </div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/mock.js"></script>
+  <script>
+  
+function iconHeart(filled=false){
+  return filled
+    ? `<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`
+    : `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`;
+}
+function iconChat(){
+  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+  </svg>`;
+}
+function iconCamera(){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4l2-2h6l2 2h4a2 2 0 0 1 2 2z"/>
+    <circle cx="12" cy="13" r="4"/>
+  </svg>`;
+}
+
+  </script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

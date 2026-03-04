@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>로그인 · 찍어봐, 오늘</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="phone">
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="title">찍어봐, 오늘</div>
+          <div class="sub">로그인</div>
+        </div>
+        <div class="top-actions">
+          <button class="pill" onclick="window.location.href='index.html'">닫기</button>
+        </div>
+      </header>
+
+      <main class="form">
+        <h1>찍어봐, 오늘</h1>
+
+        <div class="field">
+          <input class="input" id="username" placeholder="아이디" autocomplete="username" />
+        </div>
+        <div class="field">
+          <input class="input" id="password" type="password" placeholder="비밀번호" autocomplete="current-password" />
+        </div>
+
+        <button class="btn primary" id="loginBtn">로그인</button>
+
+        <div class="divider">OR</div>
+
+        <div class="linkline">
+          계정이 없으신가요? <a href="signup.html">회원가입</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/mock.js"></script>
+  <script src="assets/js/login.js"></script>
+</body>
+</html>
