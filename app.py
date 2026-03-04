@@ -2,7 +2,6 @@
 from flask import Flask, render_template, jsonify, request
 from flask.json.provider import JSONProvider
 from bson import ObjectId
-from pymongo import MongoClient
 import json
 
 from blueprints import auth, feed, mission, mypage
@@ -14,10 +13,6 @@ app.register_blueprint(auth.bp)
 app.register_blueprint(feed.bp)
 app.register_blueprint(mission.bp)
 app.register_blueprint(mypage.bp)
-
-# [DB]
-client = MongoClient('localhost', 27017)
-db = client.random_mission
 
 # [Utils] JSON 처리
 class CustomJSONEncoder(json.JSONEncoder):
