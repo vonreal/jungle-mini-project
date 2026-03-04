@@ -1,5 +1,5 @@
 # [Import]
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_from_directory
 from flask.json.provider import JSONProvider
 from bson import ObjectId
 import json
@@ -34,9 +34,13 @@ app.json = CustomJSONProvider(app)
 # 파일 크기 제한 (10MB)
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
 
+@app.route('/assets/<path:filename>')
+def serve_assets(filename):
+    return send_from_directory('templates/assets', filename)
+
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    return render_template('./index.html')
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)
