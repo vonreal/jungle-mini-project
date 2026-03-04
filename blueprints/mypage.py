@@ -26,10 +26,10 @@ def change_pofile_img_path():
         # 토큰이 뭔가 잘못됨
         return jsonify({'result': 'fail', 'msg': '로그인이 필요합니다.'})
 
-
-    new_nickname = request.form.get('nickname_give')
+    current_user = db.user.find_one({'username': user_id})
+    new_nickname = request.form.get('nickname')
     saved_file_path = handle_image.save_image(request.files, type="profile")
-    # file = request.files.get('file_give')
+    # file = request.files.get('file')
     # if not file:
     #     return jsonify({'result': 'fail', 'msg': '사진 파일이 없습니다.'})
     
@@ -40,17 +40,27 @@ def change_pofile_img_path():
     # save_path = os.path.join('static/image', file_name)
     # file.save(save_path)
 
+    nickname_regex = r'^[a-zA-Z가-힣]{1,16}$'
+    if not re.match(nickname_regex, new_nickname):
+        return jsonify({'result': 'fail', 'msg': "닉네임 형식이 올바르지 않습니다. (한글/영문 1~16자)"})
     
+    if new_nickname == current_user.get('nickname') and saved_file_path == current_user.get('profile_img_path'):
+        return jsonify({'result': 'fail', 'msg': '변경사항이 없습니다.'})
 
+    
     db.user.update_one(
         {'username': user_id},
         {'$set': {
             'nickname': new_nickname,
-            'profile_img': saved_file_path
+            'profile_img_path': saved_file_path
         }}
     )
 
     return jsonify({'result': 'success', 'msg': '프로필 수정 완료!'})
+
+def delete_user():
+    
+    return jsonify({'result': 'success', 'msg': '아이디 삭제 완료!'})
 
 @bp.route('/mypage', methods=['GET'])
 def get_mypage():
@@ -76,8 +86,7 @@ def get_mypage():
 
     for f in user_feeds:
 
-        #여기에 좋아요를 가져 올 수 있을꺼 같은데
-        
+        total_likes += len(f.get('likes', []))
 
         feeds_list.append({
             'feed_id': str(f['_id']),
@@ -88,7 +97,7 @@ def get_mypage():
     
     # 리스폰스 조
     return jsonify({
-        'profile_img': user.get('profile_img_path', 'default_profile.png'),
+        'profile_img': user.get('profile_img_path', '/static/image/default.png'),
         'nickname': user.get('nickname'),
         'likes': total_likes,
         'feed_total': len(feeds_list), 
