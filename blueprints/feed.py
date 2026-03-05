@@ -1,17 +1,19 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 from db import db
 from bson import ObjectId
 from utils import handle_image, handle_time
+from blueprints import mission
 
 bp = Blueprint('feed', __name__)
 
 # 현재 진행중인 미션 주제에 맞는 피드 전체 조회
-@bp.route('/feeds', methods=['GET'])
+# @bp.route('/feeds', methods=['GET'])
 def get_feeds():
     feeds = list(db.feeds.find({}).sort('created_date', -1))
 
     if len(feeds) == 0:
-        return jsonify({"result": "failure", "msg": "피드가 없습니다."})
+        return []
+        # return jsonify({"result": "failure", "msg": "피드가 없습니다."})
 
     for feed in feeds:
         feed['_id'] = str(feed['_id'])
@@ -22,12 +24,19 @@ def get_feeds():
         # feed['profile_img'] = user['profile_img']
         # feed['nickname'] = user['nickname']
 
+        feed['profile_img_path'] = ''
         feed['created_date'] = handle_time.display_time(feed['created_date'])
         feed['comment_count'] = len(feed['comments'])
         del feed['comments']
         del feed['mission_id']
         
-    return jsonify({'feed_total': len(feeds), 'feeds': feeds})
+    
+    return feeds
+    # return jsonify({'feed_total': len(feeds), 'feeds': feeds})
+
+@bp.route('/feed')
+def show_feed_page():
+    return render_template('feed_detail.html')
 
 @bp.route('/feed', methods=['GET'])
 def get_feed():
@@ -61,7 +70,12 @@ def get_feed():
 
     return jsonify({"result": feed})
 
-@bp.route('/feed_post', methods=['POST'])
+@bp.route('/post')
+def show_post_html():
+    today_mission = mission.get_mission()
+    return render_template('create.html', mission=today_mission)
+
+@bp.route('/post', methods=['POST'])
 def write_feed():
     try:
         user_id = ObjectId(request.form.get('userId', ''))
@@ -77,6 +91,10 @@ def write_feed():
         image_url = handle_image.save_image(request.files)
     except:
         return jsonify({'result': 'failure', 'msg': '이미지가 필요합니다.'})
+    
+    # existed_feed = db.feeds.find_one({'mission_id': mission_id, 'user_id': user_id})
+    # if existed_feed:
+    #     return jsonify({'result': 'failure', 'msg': '오늘은 이미 참여했습니다.\n하루에 한 번만 참여할 수 있습니다.'})
 
     try:
         db.feeds.insert_one({
