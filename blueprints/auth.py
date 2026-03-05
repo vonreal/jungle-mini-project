@@ -1,11 +1,17 @@
-from flask import Flask, render_template, jsonify, request,Blueprint,make_response
+from flask import render_template, jsonify, request, Blueprint, make_response
 from db import db
 import hashlib
 from datetime import datetime,timedelta
 import re
 import jwt
+from utils import handle_time
 
 bp = Blueprint('auth', __name__)
+
+@bp.route('/register')
+def show_register():
+    return render_template('signup.html')
+
 
 @bp.route('/register', methods=['post'])
 def create_id():
@@ -46,7 +52,7 @@ def create_id():
         'username': new_id_receive,
         'password': new_hash_password,
         'nickname': new_nickname_receive,
-        'create_date':datetime.now().strftime('%Y%m%d%H%M%S')
+        'create_date': handle_time.get_now(),
     }
 
     db.user.insert_one(doc)

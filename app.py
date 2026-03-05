@@ -1,5 +1,5 @@
 # [Import]
-from flask import Flask, render_template, jsonify, request, send_from_directory
+from flask import Flask, render_template, send_from_directory
 from flask.json.provider import JSONProvider
 from bson import ObjectId
 import json
@@ -52,7 +52,7 @@ def hello_world():
 
     # user에서 프로필 이미지 경로 받기
 
-    return render_template('./index.html', mission=mission_result, feeds=feed.get_feeds(), isLogin=is_login, user=user)
+    return render_template('index.html', mission=mission_result, feeds=feed.get_feeds(), isLogin=is_login, user=user)
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)

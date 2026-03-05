@@ -75,7 +75,3 @@ def get_mypage():
         'feed_total': len(feeds_list), 
         'feeds': feeds_list
     })
-
-@bp.route('/')
-def hello_world():
-    return render_template('./index.html')
