@@ -66,9 +66,11 @@
                   {{comment.nickname}}
                   <span style="color:var(--muted); font-weight:800; font-size:11px;">· {{comment.created_date}}</span>
                 </div>
+                {% if current_user_id and current_user_id == comment.user_id %}
                 <button class="comment-del" type="button" title="댓글 삭제" aria-label="댓글 삭제"
                   onclick="deleteComment('{{feed._id}}', '{{comment._id}}')"
                   style="border:none; background:transparent; color:var(--muted); font-weight:900; cursor:pointer;">✕</button>
+                {% endif %}
               </div>
               <div class="txt">{{comment.content}}</div>
             </div>

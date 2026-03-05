@@ -60,6 +60,10 @@
                       <div class="name">{{feed.nickname}}</div>
                       <div class="time">{{feed.created_date}}</div>
                     </div>
+                    {% if current_user_id and current_user_id == feed.user_id %}
+                    <button type="button" title="피드 삭제" aria-label="피드 삭제" onclick="deleteFeed('{{feed._id}}')"
+                      style="margin-left: auto; border:none; background:transparent; color:var(--muted); font-weight:900; cursor:pointer;">✕</button>
+                    {% endif %}
                   </div>
 
                   <!-- TODO: 이미지경로가 빈값일 경우 기본 처리 필요 (색상만 있는 원형)-->
@@ -90,7 +94,6 @@
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
                       </svg><span class="count">{{feed.comment_count}}</span></button>
-                    <span class="hash"># {{mission.content}}</span>
                   </div>
                 </article>
                 {% endfor %}

@@ -73,6 +73,7 @@ def show_feed_page(feed_id):
 
     # [Feed] mission, img, upload_at, like, comment
     feed = get_mission_data(feed, feed['mission_id'])
+    feed['likes'] = [str(l) for l in feed.get('likes', [])]
     feed['created_date'] = handle_time.display_time(feed['created_date'])
     feed['comment_count'] = len(feed['comments'])
     for comment in feed['comments']:
@@ -243,6 +244,7 @@ def get_user_data(target, user_id):
     if user == None:
         return target
 
+    target['user_id'] = str(user['_id'])
     target['nickname'] = user['nickname']
     target['profile_img_path'] = user['profile_img_path']
 
