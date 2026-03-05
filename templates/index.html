@@ -34,8 +34,6 @@
             </section>
             {% else %}
             <section class="mission">
-              <!-- TODO: 종료 시간까지 남은 시간 카운트 되도록 처리해야함, 시간이 지났거나 끝났을 경우 '마감'처리 -->
-              <span class="day" id="dayPill"></span>
               <span class="countdown" id="challengeTimer" aria-label="챌린지 종료까지 남은 시간"> 챌린지 종료까지 남은
                 시간</span>
               <h1 id="missionTitle">{{mission.content}}</h1>
@@ -123,8 +121,8 @@
     </div>
   </div>
 
-  <!-- <script src="assets/js/common.js"></script> -->
-  <!-- <script src="assets/js/main.js"></script> -->
+  <!-- <script src="assets/js/common.js"></script>
+  <script src="assets/js/main.js"></script> -->
   <!-- <script src="assets/js/mock.js"></script> -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script>
@@ -176,7 +174,7 @@
 
     function getFeeds(orderType) {
       $.ajax({
-        type: 'get',
+        type: 'post',
         url: '/feeds',
         data: {
           orderType: orderType,

@@ -13,7 +13,6 @@ def display_time(target):
     elif (minutes := round(seconds/60)) < 60:
         result = f'{minutes}분 전'
     elif (hours := round(minutes/60)) < 24:
-        print(diff.seconds)
         result = f'{hours}시간 전'
     elif diff.days < 7:
         result = f'{diff.days}일 전'

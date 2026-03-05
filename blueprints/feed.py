@@ -7,9 +7,9 @@ from blueprints import mission
 bp = Blueprint('feed', __name__)
 
 # [피드 전체 목록]
-@bp.route('/feeds', methods=['GET'])
-def get_feeds_with_order():    
-    order_type = get_order_type(request.form.get('order_type', 'LATEST'))
+@bp.route('/feeds', methods=['POST'])
+def get_feeds_with_order():
+    order_type = get_order_type(request.form.get('orderType', 'LATEST'))
     feeds = get_feeds(order_type)
 
     if len(feeds) == 0:
@@ -17,7 +17,7 @@ def get_feeds_with_order():
         
     return jsonify({'result': 'success', 'feeds': feeds})
 
-def get_feeds(order_type='LATEST'):
+def get_feeds(order_type):
     feeds = get_ordered_feeds(order_type)
 
     for feed in feeds:
@@ -25,6 +25,8 @@ def get_feeds(order_type='LATEST'):
         feed['created_date'] = handle_time.display_time(feed['created_date'])
         feed['likes'] = [str(l) for l in feed.get('likes', [])]
         feed['comment_count'] = len(feed['comments'])
+        for comment in feed.get('comments', []):
+            comment['created_date'] = handle_time.display_time(comment['created_date'])
 
         # [유저] 프로필 이미지 경로, 닉네임 
         feed = get_user_data(feed, feed['user_id'])
@@ -37,9 +39,9 @@ def get_ordered_feeds(order_type):
 
     if order_type in ('likes', 'comments'):
         feeds = list(db.feeds.aggregate([
-            {'mission_id': now_mission['_id']},
+            {"$match": {'mission_id': now_mission['_id']}},
             {"$addFields": {"sort_count": {"$size": f"${order_type}"}}},
-            {"$sort": {"sort_count": -1}}
+            {"$sort": {"sort_count": -1, "created_date": -1}}
         ]))
     else:
         feeds = list(db.feeds.find({'mission_id': now_mission['_id']}).sort(order_type, -1))
@@ -47,7 +49,7 @@ def get_ordered_feeds(order_type):
     return feeds
 
 def get_order_type(order_type):
-    if order_type == 'COMMNET':
+    if order_type == 'COMMENT':
         return 'comments'
     elif order_type == 'LIKE':
         return 'likes'
@@ -81,6 +83,7 @@ def show_feed_page(feed_id):
     # [Current User]
     current_user, _ = auth_help.get_user_from_token()
     current_user_id = str(current_user['_id']) if current_user else None
+    feed['user_id'] = str(feed['user_id'])
 
     return render_template('feed_detail.html', feed=feed, current_user_id=current_user_id)
 

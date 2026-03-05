@@ -46,7 +46,7 @@ def hello_world():
 
     # 2. 오늘의 미션, 피드 목록, 로그인 user Id 전달
     mission_result = mission.get_mission()
-    feeds = feed.get_feeds()
+    feeds = feed.get_feeds("created_date")
     current_user_id = str(user['_id']) if user else None
 
     return render_template('index.html', 
