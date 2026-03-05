@@ -1,11 +1,13 @@
 <!doctype html>
 <html lang="ko">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>찍어봐, 오늘</title>
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
+
 <body>
   <div class="phone">
     <div class="app">
@@ -15,68 +17,138 @@
           <div class="sub" id="todayText"></div>
         </div>
         <div class="top-actions" id="topActions">
-     
+          {% if isLogin %}
+          <img class="avatar" src="{{ user.profile_img_path }}" alt="프로필" style="cursor: pointer;">
+          {% else %}
+          <button class="pill primary" onclick="window.href.location = '/login'">로그인</button>
+          <button class="pill" onclick="window.location.href = '/register'"">가입하기</button>
+          {% endif %}
         </div>
       </header>
+      <main class=" main">
+            {% if mission == None %}
+            <section class="mission">
+              <h1 id="missionTitle">오늘은 미션이 없어요!<br>내일 만나요 :)</h1>
+            </section>
+            {% else %}
+            <section class="mission">
+              <!-- TODO: 종료 시간까지 남은 시간 카운트 되도록 처리해야함, 시간이 지났거나 끝났을 경우 '마감'처리 -->
+              <span class="day" id="dayPill" data-end="{{ mission.end_date }}"></span>
+              <h1 id="missionTitle">{{ mission.content }}</h1>
+              <div class="meta-row">
+                <span id="missionParticipants">+ {{ mission.participants }}명 참여중</span>
+              </div>
+            </section>
+            {% endif %}
 
-      <main class="main">
-        <section class="mission">
-          <span class="day" id="dayPill">Day 1</span>
-          <h1 id="missionTitle">파란색을 찾아보자!</h1>
-          <div class="meta-row">
-            <span id="missionDate">2026.03.04 · 미션</span>
-            <span id="missionParticipants">+ 239명 참여중</span>
-          </div>
-        </section>
 
-        <section class="section">
-          <div class="tabs" id="tabs">
-            <div class="tab active" data-sort="latest">최신순</div>
-            <div class="tab" data-sort="likes">좋아요순</div>
-            <div class="tab" data-sort="comments">댓글 많은 순</div>
-          </div>
+            <section class="section">
+              <div class="tabs" id="tabs">
+                <div class="tab active" data-sort="latest">최신순</div>
+                <div class="tab" data-sort="likes">좋아요순</div>
+                <div class="tab" data-sort="comments">댓글 많은 순</div>
+              </div>
 
-          <div id="feedList"></div>
-        </section>
-      </main>
+              {% if feeds | length > 0 %}
+              <div id="feedList">
+                {% for feed in feeds %}
+                <article class="feed-card" onclick="window.location.href='/feed/{{feed._id}}'">
+                  <div class="feed-head">
+                    {% if feed.profile_img_path %}
+                    <img class="avatar" src="{{feed.profile_img_path}}" alt="avatar" />
+                    {% else %}
+                    <div class="avatar"></div>
+                    {% endif %}
+                    <div class="info">
+                      <div class="name">{{feed.nickname}}</div>
+                      <div class="time">{{feed.created_date}}</div>
+                    </div>
+                  </div>
 
-      <button class="fab" id="fab" aria-label="피드 작성">
-        
-      </button>
+                  <!-- TODO: 이미지경로가 빈값일 경우 기본 처리 필요 (색상만 있는 원형)-->
+                  <div class="feed-img" role="button" tabindex="0">
+                    <img src="{{feed.feed_img_path}}" alt="feed image" />
+                  </div>
 
-      <button class="fab-top" id="fabTop" aria-label="맨 위로">↑</button>
+                  <!-- TODO 하트, 댓글 이미지 필요 -->
+                  <div class="actions">
+                    <button class="icon-btn like-btn" onclick="like()">하트<span class="count">{{feed.likes |
+                        length}}</span></button>
+                    <button class="icon-btn chat-btn">댓글<span class="count">{{feed.comments |
+                        length}}</span></button>
+                    <span class="hash"># {{mission.content}}</span>
+                  </div>
+                </article>
+                {% endfor %}
+              </div>
+              {% else %}
+              <div id="feedList">
+                <p>아직 올라온 피드가 없어요.<br>첫 피드의 주인공이 되어주세요!</p>
+              </div>
+              {% endif %}
+              </main>
 
-      <div class="cta-login" id="loginCta">
-        <p>로그인하고 인증샷을 올려보세요</p>
-        <button class="mini" id="ctaGoLogin">로그인</button>
-      </div>
-</div>
+              <button class="fab" id="fab" aria-label="피드 작성" onclick="window.location.href='/post'">
 
+              </button>
+
+              <button class="fab-top" id="fabTop" aria-label="맨 위로">↑</button>
+
+              <div class="cta-login" id="loginCta">
+                <p>로그인하고 인증샷을 올려보세요</p>
+                <button class="mini" id="ctaGoLogin">로그인</button>
+              </div>
+        </div>
     </div>
   </div>
 
-  <script src="assets/js/common.js"></script>
-  <script src="assets/js/mock.js"></script>
+  <!-- <script src="assets/js/common.js"></script>
+  <!-- <script src="assets/js/main.js"></script> -->
+  <!-- <script src="assets/js/mock.js"></script> -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script>
-  
-function iconHeart(filled=false){
-  return filled
-    ? `<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`
-    : `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`;
-}
-function iconChat(){
-  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    // [Functions]
+    $(document).ready(function () {
+    });
+
+    function like() {
+      $.ajax({
+        type: POST,
+        url: '/like',
+        data: {
+          title: memo_title,
+          content: memo_content,
+        },
+        success: function (response) {
+          if (response['result'] === 'failure') {
+            alert(response['msg']);
+            return;
+          }
+          alert(response['msg']);
+        }
+      });
+    }
+  </script>
+  <script>
+
+    function iconHeart(filled = false) {
+      return filled
+        ? `<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`
+        : `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`;
+    }
+    function iconChat() {
+      return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
   </svg>`;
-}
-function iconCamera(){
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    }
+    function iconCamera() {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4l2-2h6l2 2h4a2 2 0 0 1 2 2z"/>
     <circle cx="12" cy="13" r="4"/>
   </svg>`;
-}
+    }
 
   </script>
-  <script src="assets/js/main.js"></script>
 </body>
+
 </html>

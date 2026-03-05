@@ -7,6 +7,10 @@ import jwt
 
 bp = Blueprint('auth', __name__)
 
+@bp.route('/register')
+def show_register():
+    return render_template('signup.html')
+
 @bp.route('/register', methods=['post'])
 def create_id():
     #1 아이디 비번 비번확인 닉네임 받아

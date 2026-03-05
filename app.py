@@ -5,6 +5,7 @@ from bson import ObjectId
 import json
 
 from blueprints import auth, feed, mission, mypage
+from utils import auth_help
 
 app = Flask(__name__)
 
@@ -40,7 +41,18 @@ def serve_assets(filename):
 
 @app.route('/')
 def hello_world():
-    return render_template('./index.html')
+    # 토큰
+    user, _ = auth_help.get_user_from_token()
+    is_login = False
+
+    if user != None:
+        is_login = True
+
+    mission_result = mission.get_mission()
+
+    # user에서 프로필 이미지 경로 받기
+
+    return render_template('./index.html', mission=mission_result, feeds=feed.get_feeds(), isLogin=is_login, user=user)
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)
