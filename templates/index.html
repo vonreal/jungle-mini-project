@@ -126,7 +126,6 @@
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script>
-    // Utility functions
     const todayK = () => {
       const d = new Date();
       const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -289,12 +288,10 @@
                   </div>
                 </div>
 
-                <!-- TODO: 이미지경로가 빈값일 경우 기본 처리 필요 (색상만 있는 원형)-->
                 <div class="feed-img" role="button" tabindex="0" onclick="moveFeedDetailPage('${feed_id}')">
                   <img src="${feed_img}" alt="feed image" />
                 </div>
 
-                <!-- TODO 하트, 댓글 이미지 필요 -->
                 <div class="actions">
                   <button class="icon-btn like-btn" onclick="like('${feed_id}')">${iconHeart((likes || []).includes(CURRENT_USER_ID))}<span class="count">${likes.length}</span></button>
                   <button class="icon-btn chat-btn" onclick="moveFeedDetailPage('${feed_id}')">${iconChat()}<span class="count">${commentsCnt}</span></button>
