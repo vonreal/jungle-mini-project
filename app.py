@@ -52,7 +52,8 @@ def hello_world():
 
     # user에서 프로필 이미지 경로 받기
 
-    return render_template('index.html', mission=mission_result, feeds=feed.get_feeds(), isLogin=is_login, user=user)
+    current_user_id = str(user['_id']) if user else None
+    return render_template('index.html', mission=mission_result, feeds=feed.get_feeds(), isLogin=is_login, user=user, current_user_id=current_user_id)
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)

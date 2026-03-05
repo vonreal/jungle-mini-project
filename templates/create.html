@@ -13,11 +13,11 @@
     <div class="app">
       <header class="topbar">
         <div class="top-actions" style="gap:6px">
-          <button class="pill" onclick="navBack('index.html')">←</button>
+          <button class="pill" onclick="window.location.href='/'">←</button>
         </div>
         <div style="font-weight:900">피드 작성</div>
         <div class="top-actions">
-          <button class="pill primary" id="submitBtn">올리기</button>
+          <button class="pill primary" id="submitBtn" onclick="uploadFeed()">올리기</button>
         </div>
       </header>
 
@@ -25,13 +25,13 @@
         <div class="tag"># <span id="tagText" mission="{{mission._id}}">{{ mission.content }}</span></div>
 
         <form method="post" enctype="multipart/form-data">
-          <div class="drop" id="drop">
+          <div class="drop" id="drop" onclick="openFilePicker()">
             <div>
               <div style="font-weight:900; color:#111827; margin-bottom:6px;">사진을 첨부하세요</div>
               <small>탭해서 업로드</small>
             </div>
           </div>
-          <input type="file" id="file" accept="image/*" class="hidden" />
+          <input type="file" id="file" accept="image/*" class="hidden" onchange="previewImage()" />
         </form>
 
 
@@ -47,9 +47,55 @@
     </div>
   </div>
 
-  <script src="assets/js/common.js"></script>
+  <!-- <script src="assets/js/common.js"></script>
   <script src="assets/js/mock.js"></script>
-  <script src="assets/js/create.js"></script>
+  <script src="assets/js/create.js"></script> -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script>
+    function openFilePicker() {
+      $('#file').click();
+    }
+
+    function previewImage() {
+      var file = $('#file')[0].files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        $('#previewImg').attr('src', e.target.result);
+        $('#preview').show();
+        $('#drop').hide();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function uploadFeed() {
+      var fileInput = $('#file')[0];
+      if (fileInput.files.length === 0) {
+        alert("파일을 선택해주세요.");
+        return;
+      }
+
+      var formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+      formData.append('missionId', '{{ mission._id }}');
+
+      $.ajax({
+        type: 'POST',
+        url: '/post',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+          if (response['result'] === 'failure') {
+            alert(response['msg']);
+            return;
+          }
+          alert(response['msg']);
+          window.location.href = '/';
+        },
+      });
+    }
+  </script>
 </body>
 
 </html>

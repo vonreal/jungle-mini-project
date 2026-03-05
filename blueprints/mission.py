@@ -26,6 +26,9 @@ def get_mission():
         'end_date': {'$gt': now}
     })
 
+    if mission == None:
+        return None
+
     feeds = list(db.feeds.find({'mission_id': mission['_id']}))
     mission['participants'] = len(feeds)
 

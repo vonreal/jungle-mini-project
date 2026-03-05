@@ -1,54 +1,187 @@
 <!doctype html>
 <html lang="ko">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>피드 상세 · 찍어봐, 오늘</title>
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
+
 <body>
   <div class="phone">
     <div class="app">
       <header class="topbar">
         <div class="top-actions" style="gap:6px">
-          <button class="pill" onclick="navBack('index.html')">←</button>
+          <button class="pill" onclick="window.location.href='/'">←</button>
         </div>
         <div style="font-weight:900">피드 상세</div>
         <div class="top-actions">
-          <button class="pill" id="detailMore">⋯</button>
+          {% if current_user_id and current_user_id == feed.user_id %}
+          <button class="pill" id="detailMore" onclick="deleteFeed('{{feed._id}}')">⋯</button>
+          {% endif %}
         </div>
       </header>
 
       <main class="main" style="padding-bottom:88px">
-        <div class="feed-head" id="dHead"></div>
-        <div class="feed-img" id="dImg"></div>
-        <div class="actions" id="dActions"></div>
-
+        <div class="feed-head" id="dHead">
+          <img class="avatar" src="" alt="avatar">
+          <div class="info">
+            <div class="name">{{feed.nickname}}</div>
+            <div class="time">{{feed.created_date}}</div>
+          </div>
+        </div>
+        <div class="feed-img" id="dImg"><img src="{{feed.feed_img_path}}" alt="feed"></div>
+        <div class="actions" id="dActions">
+          <button class="icon-btn" id="likeBtn" onclick="like('{{feed._id}}')">
+            {% if current_user_id and current_user_id in feed.likes %}
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z">
+              </path>
+            </svg>
+            {% else %}
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z">
+              </path>
+            </svg>
+            {% endif %}
+            <span class="count">{{feed.likes | length}}</span>
+          </button>
+          <button class="icon-btn" id="chatBtn"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+            </svg> <span class="count">{{feed.comments | length}}</span></button>
+          <span class="hash">#{{feed.mission}}</span>
+        </div>
         <div style="margin-top:10px; color:var(--muted); font-size:12px; font-weight:900;">댓글</div>
-        <div id="dComments"></div>
+        <div id="dComments">
+          {% for comment in feed.comments %}
+          <div class="comment">
+            <img class="avatar" src="assets/img/avatar.jpg" alt="av">
+            <div class="bubble">
+              <div class="who" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                <div>
+                  {{comment.nickname}}
+                  <span style="color:var(--muted); font-weight:800; font-size:11px;">· {{comment.created_date}}</span>
+                </div>
+                <button class="comment-del" type="button" title="댓글 삭제" aria-label="댓글 삭제"
+                  onclick="deleteComment('{{feed._id}}', '{{comment._id}}')"
+                  style="border:none; background:transparent; color:var(--muted); font-weight:900; cursor:pointer;">✕</button>
+              </div>
+              <div class="txt">{{comment.content}}</div>
+            </div>
+          </div>
+          {% endfor %}
+
       </main>
 
       <div class="commentbar" style="position:absolute; left:0; right:0; bottom:0;">
         <input class="input" id="dCommentInput" placeholder="댓글을 남겨주세요!" />
-        <button class="send" id="dSend">↗</button>
+        <button class="send" id="dSend" onclick="comment('{{feed._id}}')">↗</button>
       </div>
     </div>
   </div>
 
-  <script src="assets/js/common.js"></script>
+  <!-- <script src="assets/js/common.js"></script>
   <script src="assets/js/mock.js"></script>
+  <script src="assets/js/feed_detail.js"></script> -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
   <script>
-  function iconHeart(filled=false){
-    return filled
-      ? `<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`
-      : `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`;
-  }
-  function iconChat(){
-    return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    // [Functions]
+    $(document).ready(function () {
+
+    });
+
+    function deleteFeed(feedId) {
+      $.ajax({
+        type: 'post',
+        url: '/delete_feed',
+        data: {
+          feedId: feedId,
+        },
+        success: function (response) {
+          if (response['result'] === 'failure') {
+            alert(response['msg']);
+            return;
+          }
+          alert(response['msg']);
+          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
+        }
+      });
+    }
+
+    function deleteComment(feedId, commentId) {
+      $.ajax({
+        type: 'post',
+        url: '/delete_comment',
+        data: {
+          feedId: feedId,
+          commentId: commentId,
+        },
+        success: function (response) {
+          if (response['result'] === 'failure') {
+            alert(response['msg']);
+            return;
+          }
+          alert(response['msg']);
+          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
+        }
+      });
+    }
+
+    function comment(feedId) {
+      let comment = $('#dCommentInput').val();
+
+      $.ajax({
+        type: 'post',
+        url: '/comment',
+        data: {
+          feedId: feedId,
+          comment: comment,
+        },
+        success: function (response) {
+          if (response['result'] === 'failure') {
+            alert(response['msg']);
+            return;
+          }
+          alert(response['msg']);
+          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
+        }
+      });
+    }
+
+    function like(feedId) {
+      $.ajax({
+        type: 'post',
+        url: '/like',
+        data: {
+          feedId: feedId,
+        },
+        success: function (response) {
+          if (response['result'] === 'failure') {
+            alert(response['msg']);
+            return;
+          }
+          alert(response['msg']);
+          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
+        }
+      });
+    }
+
+    function iconHeart(filled = false) {
+      return filled
+        ? `<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`
+        : `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`;
+    }
+    function iconChat() {
+      return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
     </svg>`;
-  }
+    }
   </script>
-  <script src="assets/js/feed_detail.js"></script>
 </body>
+
 </html>

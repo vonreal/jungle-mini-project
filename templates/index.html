@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>찍어봐, 오늘</title>
   <link rel="stylesheet" href="assets/css/style.css" />
+  <meta name="current-user-id" content="{{ current_user_id or '' }}">
 </head>
 
 <body>
@@ -33,26 +34,27 @@
             {% else %}
             <section class="mission">
               <!-- TODO: 종료 시간까지 남은 시간 카운트 되도록 처리해야함, 시간이 지났거나 끝났을 경우 '마감'처리 -->
-              <span class="day" id="dayPill" data-end="{{ mission.end_date }}"></span>
-              <h1 id="missionTitle">{{ mission.content }}</h1>
+              <span class="day" id="dayPill"></span>
+              <span class="countdown" id="challengeTimer" aria-label="챌린지 종료까지 남은 시간"> 챌린지 종료까지 남은
+                시간</span>
+              <h1 id="missionTitle">{{mission.content}}</h1>
               <div class="meta-row">
-                <span id="missionParticipants">+ {{ mission.participants }}명 참여중</span>
+                <span id="missionDate">2026.03.05 · 챌린지</span>
+                <span id="missionParticipants">+ {{mission.participants}}명 참여중</span>
               </div>
             </section>
-            {% endif %}
-
 
             <section class="section">
               <div class="tabs" id="tabs">
-                <div class="tab active" data-sort="latest">최신순</div>
-                <div class="tab" data-sort="likes">좋아요순</div>
-                <div class="tab" data-sort="comments">댓글 많은 순</div>
+                <div class="tab active" data-sort="latest" id="LATEST-TAB" onclick="getFeeds('LATEST')">최신순</div>
+                <div class="tab" data-sort="likes" id="LIKE-TAB" onclick="getFeeds('LIKE')">좋아요순</div>
+                <div class="tab" data-sort="comments" id="COMMENT-TAB" onclick="getFeeds('COMMENT')">댓글 많은 순</div>
               </div>
 
               {% if feeds | length > 0 %}
               <div id="feedList">
                 {% for feed in feeds %}
-                <article class="feed-card" onclick="window.location.href='/feed/{{feed._id}}'">
+                <article class="feed-card">
                   <div class="feed-head">
                     {% if feed.profile_img_path %}
                     <img class="avatar" src="{{feed.profile_img_path}}" alt="avatar" />
@@ -66,16 +68,29 @@
                   </div>
 
                   <!-- TODO: 이미지경로가 빈값일 경우 기본 처리 필요 (색상만 있는 원형)-->
-                  <div class="feed-img" role="button" tabindex="0">
+                  <div class="feed-img" role="button" tabindex="0" onclick="moveFeedDetailPage('{{feed._id}}')">
                     <img src="{{feed.feed_img_path}}" alt="feed image" />
                   </div>
 
                   <!-- TODO 하트, 댓글 이미지 필요 -->
                   <div class="actions">
-                    <button class="icon-btn like-btn" onclick="like()">하트<span class="count">{{feed.likes |
-                        length}}</span></button>
-                    <button class="icon-btn chat-btn">댓글<span class="count">{{feed.comments |
-                        length}}</span></button>
+
+                    <button class="icon-btn like-btn" onclick="like('{{feed._id}}')">
+                      {% if current_user_id and current_user_id in feed.likes %}
+                      <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"></path>
+                      </svg>
+                      {% else %}
+                      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"></path>
+                      </svg>
+                      {% endif %}
+                      <span class="count">{{feed.likes | length}}</span>
+                    </button>
+                    <button class="icon-btn chat-btn" onclick="moveFeedDetailPage('{{feed._id}}')"><svg class="icon"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+                      </svg><span class="count">{{feed.comment_count}}</span></button>
                     <span class="hash"># {{mission.content}}</span>
                   </div>
                 </article>
@@ -88,9 +103,13 @@
               {% endif %}
               </main>
 
-              <button class="fab" id="fab" aria-label="피드 작성" onclick="window.location.href='/post'">
-
-              </button>
+              {% if isLogin %}
+              <button class="fab" id="fab" aria-label="피드 작성" onclick="window.location.href='/post'"><svg
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4l2-2h6l2 2h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg></button>
+              {% endif %}
 
               <button class="fab-top" id="fabTop" aria-label="맨 위로">↑</button>
 
@@ -98,26 +117,28 @@
                 <p>로그인하고 인증샷을 올려보세요</p>
                 <button class="mini" id="ctaGoLogin">로그인</button>
               </div>
+              {% endif %}
         </div>
     </div>
   </div>
 
-  <!-- <script src="assets/js/common.js"></script>
+  <!-- <script src="assets/js/common.js"></script> -->
   <!-- <script src="assets/js/main.js"></script> -->
   <!-- <script src="assets/js/mock.js"></script> -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script>
+    const CURRENT_USER_ID = document.querySelector('meta[name="current-user-id"]').getAttribute('content') || null;
+
     // [Functions]
     $(document).ready(function () {
     });
 
-    function like() {
+    function deleteFeed(feedId) {
       $.ajax({
-        type: POST,
-        url: '/like',
+        type: 'post',
+        url: '/delete_feed',
         data: {
-          title: memo_title,
-          content: memo_content,
+          feedId: feedId,
         },
         success: function (response) {
           if (response['result'] === 'failure') {
@@ -125,9 +146,90 @@
             return;
           }
           alert(response['msg']);
+          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
         }
       });
     }
+
+    function like(feedId) {
+      $.ajax({
+        type: 'post',
+        url: '/like',
+        data: {
+          feedId: feedId,
+        },
+        success: function (response) {
+          if (response['result'] === 'failure') {
+            alert(response['msg']);
+            return;
+          }
+          alert(response['msg']);
+          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
+        }
+      });
+    }
+
+    function moveFeedDetailPage(feedId) {
+      window.location.href = `/feed/${feedId}`;
+    }
+
+    function getFeeds(orderType) {
+      $.ajax({
+        type: 'get',
+        url: '/feeds',
+        data: {
+          orderType: orderType,
+        },
+        success: function (response) {
+          if (response['result'] === 'failure') {
+            alert(response['msg']);
+            return;
+          }
+          listFeeds(response['feeds'])
+        }
+      });
+
+      function listFeeds(datas) {
+        $('#feedList').empty();
+
+        for (let i = 0; i < datas.length; i++) {
+          data = datas[i];
+          let profile_img = data['profile_img_path'];
+          let nickname = data['nickname'];
+          let created_date = data['created_date'];
+          let feed_img = data['feed_img_path'];
+          let feed_id = data['_id'];
+          let likes = data['likes'];
+          let commentsCnt = data['comment_count'];
+
+          let feed_html = `
+            <article class="feed-card">
+                <div class="feed-head">
+                  <img class="avatar" src="${profile_img}" alt="avatar" />
+                  <div class="info">
+                    <div class="name">${nickname}</div>
+                    <div class="time">${created_date}</div>
+                  </div>
+                </div>
+
+                <!-- TODO: 이미지경로가 빈값일 경우 기본 처리 필요 (색상만 있는 원형)-->
+                <div class="feed-img" role="button" tabindex="0" onclick="moveFeedDetailPage('${feed_id}')">
+                  <img src="${feed_img}" alt="feed image" />
+                </div>
+
+                <!-- TODO 하트, 댓글 이미지 필요 -->
+                <div class="actions">
+                  <button class="icon-btn like-btn" onclick="like('${feed_id}')">${iconHeart((likes || []).includes(CURRENT_USER_ID))}<span class="count">${likes.length}</span></button>
+                  <button class="icon-btn chat-btn" onclick="moveFeedDetailPage('${feed_id}')">${iconChat()}<span class="count">${commentsCnt}</span></button>
+                </div >
+             </article >
+          `;
+
+          $('#feedList').append(feed_html);
+        }
+      }
+    }
+
   </script>
   <script>
 
@@ -137,15 +239,13 @@
         : `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"/></svg>`;
     }
     function iconChat() {
-      return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
-  </svg>`;
+      return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>`;
     }
     function iconCamera() {
-      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      return `< svg viewBox = "0 0 24 24" fill = "none" stroke = "currentColor" stroke - width="2" >
     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4l2-2h6l2 2h4a2 2 0 0 1 2 2z"/>
     <circle cx="12" cy="13" r="4"/>
-  </svg>`;
+  </svg >`;
     }
 
   </script>
