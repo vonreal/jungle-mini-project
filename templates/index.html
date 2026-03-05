@@ -98,6 +98,7 @@
                 </article>
                 {% endfor %}
               </div>
+              <div id="sentinel" style="height: 40px;"></div>
               {% else %}
               <div id="feedList">
                 <p>아직 올라온 피드가 없어요.<br>첫 피드의 주인공이 되어주세요!</p>
@@ -126,17 +127,30 @@
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script>
+    const CURRENT_USER_ID = document.querySelector('meta[name="current-user-id"]').getAttribute('content') || null;
     const todayK = () => {
       const d = new Date();
       const mm = String(d.getMonth() + 1).padStart(2, "0");
       const dd = String(d.getDate()).padStart(2, "0");
       return `${d.getFullYear()}.${mm}.${dd}`;
     };
-
-    const CURRENT_USER_ID = document.querySelector('meta[name="current-user-id"]').getAttribute('content') || null;
+    let currentPage = 2;
+    let isLoading = false;
+    let hasMore = true;
+    let currentOrder = 'LATEST';
 
     // [Functions]
     jQuery(function ($) {
+      // IntersectionObserver 설정
+      const sentinel = document.getElementById('sentinel');
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) loadMore();
+        },
+        { rootMargin: '200px' }
+      );
+      observer.observe(sentinel);
+
       const todayText = document.getElementById('todayText');
       if (todayText) {
         todayText.textContent = `${todayK()}  ·  오늘`;
@@ -163,7 +177,6 @@
         const timerInterval = setInterval(updateTimer, 1000);
       }
 
-      // Scroll to top button functionality
       const fabTop = document.getElementById('fabTop');
       const app = document.querySelector('.app');
 
@@ -186,7 +199,6 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
-      // Login CTA functionality
       const loginCta = document.getElementById('loginCta');
       const fab = document.getElementById('fab');
 
@@ -251,22 +263,39 @@
     function getFeeds(orderType) {
       document.querySelectorAll('#tabs .tab').forEach(tab => tab.classList.remove('active'));
       document.getElementById(orderType + '-TAB').classList.add('active');
+
+      currentOrder = orderType;
+      currentPage = 1;
+      hasMore = true;
+      document.getElementById('feedList').innerHTML = '';
+
+      loadMore();
+    }
+
+    function loadMore() {
+      if (isLoading || !hasMore) return;
+
+      isLoading = true;
+
       $.ajax({
         type: 'POST',
         url: '/feeds',
-        data: { orderType: orderType },
+        data: { orderType: currentOrder, page: currentPage },
         success: function (response) {
           if (response['result'] === 'failure') {
             alert(response['msg']);
             return;
           }
-          listFeeds(response['feeds']);
+
+          appendFeeds(response['feeds']);
+          hasMore = response['has_more'];
+          currentPage += 1;
+          isLoading = false;
         }
       });
 
-      function listFeeds(datas) {
+      function appendFeeds(datas) {
         const feedList = document.getElementById('feedList');
-        feedList.innerHTML = '';
 
         for (let i = 0; i < datas.length; i++) {
           data = datas[i];

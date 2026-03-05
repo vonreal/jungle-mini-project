@@ -4,21 +4,23 @@ from bson import ObjectId
 from utils import handle_image, handle_time, auth_help
 from blueprints import mission
 
+PER_PAGE = 5
+
 bp = Blueprint('feed', __name__)
 
 # [피드 전체 목록]
 @bp.route('/feeds', methods=['POST'])
 def get_feeds_with_order():
     order_type = get_order_type(request.form.get('orderType', 'LATEST'))
-    feeds = get_feeds(order_type)
+    page = int(request.form.get('page', 1))
 
-    if len(feeds) == 0:
-        return jsonify({"result": "failure", "msg": "피드가 없습니다."})
+    feeds = get_feeds(order_type, page)
+    has_more = len(feeds) == PER_PAGE
         
-    return jsonify({'result': 'success', 'feeds': feeds})
+    return jsonify({'result': 'success', 'feeds': feeds, 'has_more': has_more})
 
-def get_feeds(order_type):
-    feeds = get_ordered_feeds(order_type)
+def get_feeds(order_type, page=1):
+    feeds = get_ordered_feeds(order_type, page)
 
     for feed in feeds:
         # [피드] 피드 아이디, 유저 아이디, 생성일, 피드 이미지, 좋아요, 댓글 수
@@ -33,18 +35,27 @@ def get_feeds(order_type):
 
     return feeds
 
-def get_ordered_feeds(order_type):
+def get_ordered_feeds(order_type, page=1):
     if (now_mission := mission.get_now_mission()) == None:
         return []
+    
+    skip = (page - 1) * PER_PAGE
 
     if order_type in ('likes', 'comments'):
         feeds = list(db.feeds.aggregate([
             {"$match": {'mission_id': now_mission['_id']}},
             {"$addFields": {"sort_count": {"$size": f"${order_type}"}}},
-            {"$sort": {"sort_count": -1, "created_date": -1}}
+            {"$sort": {"sort_count": -1, "created_date": -1}},
+            {"$skip": skip},
+            {"$limit": PER_PAGE}
         ]))
     else:
-        feeds = list(db.feeds.find({'mission_id': now_mission['_id']}).sort(order_type, -1))
+        feeds = list(
+            db.feeds.find({'mission_id': now_mission['_id']})
+            .sort(order_type, -1)
+            .skip(skip)
+            .limit(PER_PAGE)
+        )
 
     return feeds
 
@@ -94,7 +105,7 @@ def show_post_html():
     user, _ = auth_help.get_user_from_token()
 
     if user == None:
-        return redirect('/')
+        return redirect('/login')
     
     today_mission = mission.get_mission()
 
