@@ -1,11 +1,15 @@
 <!doctype html>
 <html lang="ko">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>회원가입 · 찍어봐, 오늘</title>
   <link rel="stylesheet" href="assets/css/style.css" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 </head>
+
 <body>
   <div class="phone">
     <div class="app">
@@ -44,8 +48,52 @@
     </div>
   </div>
 
-  <script src="assets/js/common.js"></script>
+  <!-- <script src="assets/js/common.js"></script>
   <script src="assets/js/mock.js"></script>
-  <script src="assets/js/signup.js"></script>
+  <script src="assets/js/signup.js"></script> -->
+
+  <script>
+    $(document).ready(function () {
+      $("#signupBtn").click(function () {
+        const username = $("#username").val().trim();
+        const pw1 = $("#password").val().trim();
+        const pw2 = $("#password2").val().trim();
+        const nick = $("#nickname").val().trim();
+
+        if (!username || !pw1 || !pw2 || !nick) {
+          alert("모든 항목을 입력해주세요.");
+          return;
+        }
+
+        if (pw1 !== pw2) {
+          alert("비밀번호가 일치하지 않습니다.");
+          return;
+        }
+
+        $.ajax({
+          type: "POST",
+          url: "/register",
+          data: {
+            username: username,
+            password: pw1,
+            nickname: nick
+          },
+          success: function (response) {
+            if (response['result'] === 'success') {
+              alert(response['msg']);
+              window.location.href = '/login';
+            } else {
+              alert(response['msg']);
+            }
+          },
+          error: function () {
+            alert("서버 통신 오류가 발생했습니다.");
+          }
+        });
+      });
+    });
+  </script>
+
 </body>
+
 </html>

@@ -1,47 +1,80 @@
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>로그인 · 찍어봐, 오늘</title>
-  <link rel="stylesheet" href="assets/css/style.css" />
-</head>
-<body>
-  <div class="phone">
-    <div class="app">
-      <header class="topbar">
-        <div class="brand">
-          <div class="title">찍어봐, 오늘</div>
-          <div class="sub">로그인</div>
-        </div>
-        <div class="top-actions">
-          <button class="pill" onclick="window.location.href='index.html'">닫기</button>
-        </div>
-      </header>
+  <!doctype html>
+  <html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>로그인 · 찍어봐, 오늘</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-      <main class="form">
-        <h1>찍어봐, 오늘</h1>
+  </head>
+  <body>
+    <div class="phone">
+      <div class="app">
+        <header class="topbar">
+          <div class="brand">
+            <div class="title">찍어봐, 오늘</div>
+            <div class="sub">로그인</div>
+          </div>
+          <div class="top-actions">
+            <button class="pill" onclick="window.location.href='index.html'">닫기</button>
+          </div>
+        </header>
 
-        <div class="field">
-          <input class="input" id="username" placeholder="아이디" autocomplete="username" />
-        </div>
-        <div class="field">
-          <input class="input" id="password" type="password" placeholder="비밀번호" autocomplete="current-password" />
-        </div>
+        <main class="form">
+          <h1>찍어봐, 오늘</h1>
 
-        <button class="btn primary" id="loginBtn">로그인</button>
+          <div class="field">
+            <input class="input" id="username" placeholder="아이디" autocomplete="username" />
+          </div>
+          <div class="field">
+            <input class="input" id="password" type="password" placeholder="비밀번호" autocomplete="current-password" />
+          </div>
 
-        <div class="divider">OR</div>
+          <button class="btn primary" id="loginBtn">로그인</button>
 
-        <div class="linkline">
-          계정이 없으신가요? <a href="signup.html">회원가입</a>
-        </div>
-      </main>
+          <div class="divider">OR</div>
+
+          <div class="linkline">
+            계정이 없으신가요? <a href="signup.html">회원가입</a>
+          </div>
+        </main>
+      </div>
     </div>
-  </div>
 
-  <script src="assets/js/common.js"></script>
-  <script src="assets/js/mock.js"></script>
-  <script src="assets/js/login.js"></script>
-</body>
-</html>
+    
+
+    <!-- <script src="assets/js/common.js"></script>
+    <script src="assets/js/mock.js"></script> -->
+    <!-- <script src="assets/js/login.js"></script> -->
+    
+    <script>
+      $(document).ready(function() {
+          $("#loginBtn").click(function() {
+              const username = $("#username").val().trim();
+              const password = $("#password").val().trim();
+
+              if(!username || !password){
+                  alert("아이디/비밀번호를 입력해주세요.");
+                  return;
+              }
+
+              $.ajax({
+                  type: "POST",
+                  url: "/login",
+                  data: {username: username, password: password },
+                  success: function (response) {
+                      if (response['result'] === 'success') {
+                          alert(response['msg']);
+                          window.location.href = '/'; 
+                      } 
+                      else {
+                          alert(response['msg']);
+                      }
+                  }
+              });
+          });
+      });
+    </script>
+  </body>
+  </html>

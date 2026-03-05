@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request,Blueprint
+from flask import render_template, jsonify, request,Blueprint, redirect
 from db import db
 from datetime import datetime
 import re
@@ -6,6 +6,34 @@ from bson import ObjectId
 from utils import handle_image, auth_help
 
 bp = Blueprint('mypage', __name__)
+
+@bp.route('/mypage')
+def show_register():
+
+    user, _ = auth_help.get_user_from_token()
+
+    if user is None:
+        return redirect('/login')
+
+    user_feeds = list(db.feeds.find({'user_id': user["_id"]}).sort('create_date', -1))
+
+    feeds_list = []
+    total_likes = 0
+
+    for f in user_feeds:
+        total_likes += len(f.get('likes', []))
+        feeds_list.append({
+            'feed_id': str(f['_id']),
+            'feed_img': f.get('image_path', '')
+        })
+
+    feed_total = len(feeds_list)
+
+    is_login = False
+    if user != None:
+        is_login = True
+
+    return render_template('mypage.html', isLogin=is_login, user=user, totalLikes = total_likes,feedTotal = feed_total)
 
 @bp.route('/mypage/update_mypage', methods=['post'])
 def change_pofile_img_path():

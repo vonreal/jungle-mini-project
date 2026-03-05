@@ -62,6 +62,10 @@ def create_id():
 
 
 
+@bp.route('/login')
+def show_login():
+    
+    return render_template('login.html')
 
 @bp.route('/login', methods=['post'])
 def check_login():
