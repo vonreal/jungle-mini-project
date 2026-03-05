@@ -18,10 +18,11 @@
           <div class="sub" id="todayText"></div>
         </div>
         <div class="top-actions" id="topActions">
-          {% if isLogin %}
-          <img class="avatar" src="{{ user.profile_img_path }}" alt="프로필" style="cursor: pointer;">
+          {% if user %}
+          <img class="avatar" src="{{ user.profile_img_path }}" alt="프로필" style="cursor: pointer;"
+            onclick="window.location.href = '/mypage'">
           {% else %}
-          <button class="pill primary" onclick="window.href.location = '/login'">로그인</button>
+          <button class="pill primary" onclick="window.location.href = '/login'">로그인</button>
           <button class="pill" onclick="window.location.href = '/register'"">가입하기</button>
           {% endif %}
         </div>
@@ -56,11 +57,7 @@
                 {% for feed in feeds %}
                 <article class="feed-card">
                   <div class="feed-head">
-                    {% if feed.profile_img_path %}
                     <img class="avatar" src="{{feed.profile_img_path}}" alt="avatar" />
-                    {% else %}
-                    <div class="avatar"></div>
-                    {% endif %}
                     <div class="info">
                       <div class="name">{{feed.nickname}}</div>
                       <div class="time">{{feed.created_date}}</div>
@@ -78,11 +75,15 @@
                     <button class="icon-btn like-btn" onclick="like('{{feed._id}}')">
                       {% if current_user_id and current_user_id in feed.likes %}
                       <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"></path>
+                        <path
+                          d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z">
+                        </path>
                       </svg>
                       {% else %}
                       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z"></path>
+                        <path
+                          d="M12 21s-7.5-4.6-10-9.3C.1 8.3 2.2 5 5.7 5c1.9 0 3.4 1 4.3 2.2C10.9 6 12.4 5 14.3 5 17.8 5 19.9 8.3 22 11.7 19.5 16.4 12 21 12 21z">
+                        </path>
                       </svg>
                       {% endif %}
                       <span class="count">{{feed.likes | length}}</span>
@@ -103,7 +104,7 @@
               {% endif %}
               </main>
 
-              {% if isLogin %}
+              {% if user %}
               <button class="fab" id="fab" aria-label="피드 작성" onclick="window.location.href='/post'"><svg
                   viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4l2-2h6l2 2h4a2 2 0 0 1 2 2z"></path>

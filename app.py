@@ -41,19 +41,19 @@ def serve_assets(filename):
 
 @app.route('/')
 def hello_world():
-    # 토큰
+    # 1. 쿠키에서 myToken을 가져와 Login 상태 판별
     user, _ = auth_help.get_user_from_token()
-    is_login = False
 
-    if user != None:
-        is_login = True
-
+    # 2. 오늘의 미션, 피드 목록, 로그인 user Id 전달
     mission_result = mission.get_mission()
-
-    # user에서 프로필 이미지 경로 받기
-
+    feeds = feed.get_feeds()
     current_user_id = str(user['_id']) if user else None
-    return render_template('index.html', mission=mission_result, feeds=feed.get_feeds(), isLogin=is_login, user=user, current_user_id=current_user_id)
+
+    return render_template('index.html', 
+                           mission=mission_result, 
+                           feeds=feeds,
+                           user=user,
+                           current_user_id=current_user_id)
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)

@@ -25,7 +25,7 @@
 
       <main class="main" style="padding-bottom:88px">
         <div class="feed-head" id="dHead">
-          <img class="avatar" src="" alt="avatar">
+          <img class="avatar" src="{{feed.profile_img_path}}" alt="avatar">
           <div class="info">
             <div class="name">{{feed.nickname}}</div>
             <div class="time">{{feed.created_date}}</div>
@@ -59,7 +59,7 @@
         <div id="dComments">
           {% for comment in feed.comments %}
           <div class="comment">
-            <img class="avatar" src="assets/img/avatar.jpg" alt="av">
+            <img class="avatar" src="{{comment.profile_img_path}}" alt="av">
             <div class="bubble">
               <div class="who" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
                 <div>

@@ -4,33 +4,22 @@ from utils import handle_time
 
 bp = Blueprint('mission', __name__)
 
-# 현재 시간에 활성화 된 미션을 불러온다.
-@bp.route('/mission', methods=['GET'])
-def load_mission():
-    mission = get_mission()
-    
-    if mission:
-        mission['_id'] = str(mission['_id'])
-        mission['start_date'] = mission['start_date'].isoformat()
-        mission['end_date'] = mission['end_date'].isoformat()
-    else:
-        return jsonify({'result': 'failure', 'msg': '오늘의 미션이 없습니다.'})
-
-    return jsonify({'result': 'success', 'data': mission})
-
 def get_mission():
+    if (mission := get_now_mission()) == None:
+        return None
+
+    feeds = list(db.feeds.find({'mission_id': mission['_id']}))
+    mission['participants'] = len(feeds)
+
+    return mission
+
+def get_now_mission():
     now = handle_time.get_now()
 
     mission = db.missions.find_one({
         'start_date': {'$lte': now},
         'end_date': {'$gt': now}
     })
-
-    if mission == None:
-        return None
-
-    feeds = list(db.feeds.find({'mission_id': mission['_id']}))
-    mission['participants'] = len(feeds)
 
     return mission
 
