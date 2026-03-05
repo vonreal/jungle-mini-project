@@ -12,9 +12,7 @@ def show_mypage():
     user, _ = auth_help.get_user_from_token()
     if user is None:
         return redirect('/login')
-    
-    is_login = True
-    
+
     nickname = user["nickname"]
     
     user_feeds = list(db.feeds.find({'user_id': user["_id"]}).sort('create_date', -1))
@@ -32,46 +30,11 @@ def show_mypage():
     profile_img = user.get('profile_img_path', '/assets/img/avatar.jpg')
 
     return render_template('mypage.html',
-                            isLogin=is_login,
                             nickname=nickname,
                             feedTotal=feed_total,
                             totalLikes=total_likes,
                             profileImg=profile_img,
                             feeds=feeds_list)
-
-
-
-
-@bp.route('/mypage', methods=['GET'])
-def get_mypage():
-    user, error_msg = auth_help.get_user_from_token()
-    if error_msg:
-        return jsonify({'result': 'fail', 'msg': error_msg})
-    
-    user_feeds = list(db.feeds.find({'user_id': user["_id"]}).sort('create_date', -1))
-
-    feeds_list = []
-    total_likes = 0
-
-    for f in user_feeds:
-
-        total_likes += len(f.get('likes', []))
-
-        feeds_list.append({
-            'feed_id': str(f['_id']),
-            'feed_img': f.get('image_path', '')
-        })
-
-
-    
-    # 리스폰스 조
-    return jsonify({
-        'profile_img': user['profile_img_path'],
-        'nickname': user['nickname'],
-        'likes': total_likes,
-        'feed_total': len(feeds_list), 
-        'feeds': feeds_list
-    })
 
 
 
@@ -81,15 +44,11 @@ def show_update_mypage():
 
     if user is None:
         return redirect('/login')
-    is_login = False
-    if user != None:
-        is_login = True
 
     profile_img = user.get('profile_img_path', '/assets/img/avatar.jpg')
     nickname = user.get('nickname', '')
 
     return render_template('profile_edit.html',
-                           isLogin=is_login,
                            profileImg=profile_img,
                            nickname=nickname)
 
@@ -106,6 +65,11 @@ def change_pofile_img_path():
         nickname_regex = r'^[a-zA-Z가-힣]{1,16}$'
         if not re.match(nickname_regex, new_nickname):
             return jsonify({'result': 'fail', 'msg': "닉네임 형식이 올바르지 않습니다."})
+        
+        if new_nickname != user.get('nickname'):
+            existing_user = db.user.find_one({'nickname': new_nickname})
+            if existing_user:
+                return jsonify({'result': 'fail', 'msg': '이미 사용 중인 닉네임입니다.'})
 
     image_file = request.files.get('image')
     is_default = request.form.get('is_default') == 'true'
@@ -125,10 +89,6 @@ def change_pofile_img_path():
         }}
     )
     return jsonify({'result': 'success', 'msg': '변경사항이 저장되었습니다!'})
-
-def delete_user():
-    
-    return jsonify({'result': 'success', 'msg': '아이디 삭제 완료!'})
 
 @bp.route('/logout')
 def logout():

@@ -15,13 +15,10 @@ def show_register():
 
 @bp.route('/register', methods=['post'])
 def create_id():
-    #1 아이디 비번 비번확인 닉네임 받아
-
     new_id_receive = request.form['username']
     new_password_receive =request.form['password']
     new_nickname_receive =request.form['nickname']
 
-    #3 아이디,닉네임 중복과 정규형 맞췄늕 확인
     id_dup = db.user.find_one({'username':new_id_receive})
     nickname_dup = db.user.find_one({'nickname':new_nickname_receive})
 
@@ -39,7 +36,7 @@ def create_id():
         })
 
     # 비밀번호 정규식 확인 (8~16자, 영문/숫자/특수문자 필수 조합)
-    password_regex = r'^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$'
+    password_regex = r'^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()\-=_+])[A-Za-z\d~!@#$%^&*()\-=_+]{8,16}$'
     if not re.match(password_regex, new_password_receive):
         return jsonify({
             'result': 'fail', 
@@ -55,10 +52,8 @@ def create_id():
         })
     
 
-    #4 비밀번호를 해싱
     new_hash_password = hashlib.sha256(new_password_receive.encode('utf-8')).hexdigest()
 
-    #5 디비에 유저객체를 만들어 저장해
     doc = {
         'username': new_id_receive,
         'password': new_hash_password,
@@ -82,17 +77,13 @@ def show_login():
 @bp.route('/login', methods=['post'])
 def check_login():
 
-    #1단 아이디랑 비번을 받아
     id_receive = request.form['username']
     password_receive =request.form['password']
 
-    #2제 비번을 암호화해
     hash_password = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
 
-    #3. 아이디랑 비번을 디비랑 조회를 해
     results = db.user.find_one({'username':id_receive,'password':hash_password})
 
-    #4.확인을 하고 토큰을 주거나 알림을 줘
 
     SECRET_KEY = "sheep"
     
@@ -108,7 +99,6 @@ def check_login():
 
         res = make_response(jsonify({'result': 'success', 'msg': '로그인 성공!'}))
 
-        # 클라이언트 컴퓨터 쿠기에 토큰을 저장해
         res.set_cookie('mytoken', token)
 
         return res
