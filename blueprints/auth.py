@@ -53,6 +53,7 @@ def create_id():
         'password': new_hash_password,
         'nickname': new_nickname_receive,
         'create_date': handle_time.get_now(),
+        'profile_img_path': "assets/img/avatar.jpg"
     }
 
     db.user.insert_one(doc)

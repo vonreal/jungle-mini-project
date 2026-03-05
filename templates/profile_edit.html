@@ -1,17 +1,21 @@
 <!doctype html>
 <html lang="ko">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>프로필 수정 · 찍어봐, 오늘</title>
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 </head>
+
 <body>
   <div class="phone">
     <div class="app">
       <header class="topbar">
         <div class="top-actions" style="gap:6px">
-          <button class="pill" onclick="navBack('mypage.html')">취소</button>
+          <button class="pill" onclick="window.location.href='/mypage'">취소</button>
         </div>
         <div style="font-weight:900">프로필 수정</div>
         <div class="top-actions">
@@ -21,13 +25,15 @@
 
       <main class="form" style="padding-top:14px">
         <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-          <img src="assets/img/avatar.jpg" id="avatarPrev" class="big-avatar" style="width:86px;height:86px;" alt="프로필" />
+          <img src="{{profileImg}}" id="avatarPrev" class="big-avatar" style="width:86px;height:86px;" alt="프로필" />
           <div style="display:flex; gap:14px; font-size:12px;">
             <label style="color:var(--primary); font-weight:900; cursor:pointer;">
               이미지 변경
               <input type="file" id="avatarFile" accept="image/*" class="hidden" />
             </label>
-            <button id="avatarReset" style="border:none; background:transparent; color:var(--muted); font-weight:900; cursor:pointer;">기본 이미지</button>
+            <button id="avatarReset"
+              style="border:none; background:transparent; color:var(--muted); font-weight:900; cursor:pointer;">기본
+              이미지</button>
           </div>
         </div>
 
@@ -38,8 +44,64 @@
     </div>
   </div>
 
-  <script src="assets/js/common.js"></script>
+  <!-- <script src="assets/js/common.js"></script>
   <script src="assets/js/mock.js"></script>
-  <script src="assets/js/profile_edit.js"></script>
+  <script src="assets/js/profile_edit.js"></script> -->
+
+  <script>
+    $(document).ready(function () {
+      $("#avatarFile").change(function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            $("#avatarPrev").attr("src", e.target.result); // 선택한 이미지로 미리보기 교체
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      $("#avatarReset").click(function () {
+        $("#avatarPrev").attr("src", "/assets/img/avatar.jpg");
+        $("#avatarFile").val(""); // 파일 선택 초기화
+      });
+
+      $("#doneBtn").click(function () {
+        const nickname = $("#nickname").val().trim();
+        const file = $("#avatarFile")[0].files[0];
+
+        if (!nickname) {
+          alert("닉네임을 입력해주세요.");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("nickname", nickname);
+        if (file) {
+          formData.append("image", file);
+        }
+
+        $.ajax({
+          type: "POST",
+          url: "/mypage/update_mypage",
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            if (response["result"] === "success") {
+              alert(response["msg"]);
+              window.location.href = "/mypage"; 
+            } else {
+              alert(response["msg"]);
+            }
+          },
+          error: function () {
+            alert("서버 통신 중 오류가 발생했습니다.");
+          }
+        });
+      });
+    });
+  </script>
 </body>
+
 </html>
