@@ -73,11 +73,15 @@ def check_login():
     #4.확인을 하고 토큰을 주거나 알림을 줘
 
     SECRET_KEY = "sheep"
+    
     if results is not None:
+
+        user_uid = str(results['_id'])
 
         payload = {
             'id': id_receive,
-            'exp': datetime.utcnow() + timedelta(seconds=60 * 60)  # 1시간 유효
+            'uid' : user_uid,
+            'exp': datetime.now() + timedelta(seconds=60 * 60)  # 1시간 유효
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
