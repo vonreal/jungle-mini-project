@@ -86,89 +86,72 @@
     </div>
   </div>
 
-  <!-- <script src="assets/js/common.js"></script>
-  <script src="assets/js/mock.js"></script>
-  <script src="assets/js/feed_detail.js"></script> -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
   <script>
-    // [Functions]
-    $(document).ready(function () {
-
-    });
 
     function deleteFeed(feedId) {
+      if (!confirm('피드를 삭제하시겠습니까?')) return;
       $.ajax({
-        type: 'post',
+        type: 'POST',
         url: '/delete_feed',
-        data: {
-          feedId: feedId,
-        },
+        data: { feedId: feedId },
         success: function (response) {
           if (response['result'] === 'failure') {
             alert(response['msg']);
             return;
           }
           alert(response['msg']);
-          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
+          window.location.reload();
         }
       });
     }
 
     function deleteComment(feedId, commentId) {
+      if (!confirm('댓글을 삭제하시겠습니까?')) return;
       $.ajax({
-        type: 'post',
+        type: 'POST',
         url: '/delete_comment',
-        data: {
-          feedId: feedId,
-          commentId: commentId,
-        },
+        data: { feedId: feedId, commentId: commentId },
         success: function (response) {
           if (response['result'] === 'failure') {
             alert(response['msg']);
             return;
           }
           alert(response['msg']);
-          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
+          window.location.reload();
         }
       });
     }
 
     function comment(feedId) {
-      let comment = $('#dCommentInput').val();
+      let comment = document.querySelector('#dCommentInput').value;
 
       $.ajax({
-        type: 'post',
+        type: 'POST',
         url: '/comment',
-        data: {
-          feedId: feedId,
-          comment: comment,
-        },
+        data: { feedId: feedId, comment: comment },
         success: function (response) {
           if (response['result'] === 'failure') {
             alert(response['msg']);
             return;
           }
           alert(response['msg']);
-          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
+          window.location.reload();
         }
       });
     }
 
     function like(feedId) {
       $.ajax({
-        type: 'post',
+        type: 'POST',
         url: '/like',
-        data: {
-          feedId: feedId,
-        },
+        data: { feedId: feedId },
         success: function (response) {
           if (response['result'] === 'failure') {
             alert(response['msg']);
             return;
           }
           alert(response['msg']);
-          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
+          window.location.reload();
         }
       });
     }

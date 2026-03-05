@@ -119,9 +119,9 @@ def write_feed():
     except:
         return jsonify({'result': 'failure', 'msg': '이미지가 필요합니다.'})
     
-    existed_feed = db.feeds.find_one({'mission_id': mission_id, 'user_id': uid})
-    if existed_feed:
-        return jsonify({'result': 'failure', 'msg': '오늘은 이미 참여했습니다.\n하루에 한 번만 참여할 수 있습니다.'})
+    # existed_feed = db.feeds.find_one({'mission_id': mission_id, 'user_id': uid})
+    # if existed_feed:
+    #     return jsonify({'result': 'failure', 'msg': '오늘은 이미 참여했습니다.\n하루에 한 번만 참여할 수 있습니다.'})
 
     try:
         db.feeds.insert_one({

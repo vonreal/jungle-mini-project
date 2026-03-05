@@ -37,6 +37,7 @@
 
         <div class="preview" id="preview">
           <img id="previewImg" alt="미리보기" />
+          <button type="button" class="btn" id="removeBtn" onclick="clearPreview()">사진 다시 선택</button>
         </div>
 
         <div class="help">
@@ -47,9 +48,6 @@
     </div>
   </div>
 
-  <!-- <script src="assets/js/common.js"></script>
-  <script src="assets/js/mock.js"></script>
-  <script src="assets/js/create.js"></script> -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script>
     function openFilePicker() {
@@ -66,6 +64,13 @@
         $('#drop').hide();
       };
       reader.readAsDataURL(file);
+    }
+
+    function clearPreview() {
+      $('#previewImg').attr('src', '');
+      $('#preview').hide();
+      $('#drop').show();
+      $('#file').val('');
     }
 
     function uploadFeed() {

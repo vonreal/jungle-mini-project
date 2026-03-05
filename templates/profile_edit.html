@@ -41,68 +41,65 @@
           <input class="input" id="nickname" placeholder="닉네임" value="{{ nickname }}" />
         </div>
       </main>
-      
+
     </div>
   </div>
 
-  <!-- <script src="assets/js/common.js"></script>
-  <script src="assets/js/mock.js"></script>
-  <script src="assets/js/profile_edit.js"></script> -->
 
   <script>
-  $(document).ready(function () {
-    let isDefaultImage = false;
+    jQuery(function ($) {
+      let isDefaultImage = false;
 
-    // 이미지 변경 시
-    $("#avatarFile").change(function (e) {
-      isDefaultImage = false;
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          $("#avatarPrev").attr("src", e.target.result);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // 기본 이미지 버튼 클릭 시
-    $("#avatarReset").click(function () {
-      isDefaultImage = true;
-      $("#avatarPrev").attr("src", "/assets/img/avatar.jpg");
-      $("#avatarFile").val(""); 
-    });
-
-    $("#doneBtn").click(function () {
-      const nickname = $("#nickname").val().trim();
-      const file = $("#avatarFile")[0].files[0];
-
-      const formData = new FormData();
-      formData.append("nickname", nickname);
-      formData.append("is_default", isDefaultImage);
-      
-      if (file) {
-        formData.append("image", file);
-      }
-
-      $.ajax({
-        type: "POST",
-        url: "/mypage/update_mypage",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (response) {
-          if (response["result"] === "success") {
-            alert(response["msg"]);
-            window.location.href = "/mypage";
-          } else {
-            alert(response["msg"]);
-          }
+      // 이미지 변경 시
+      $("#avatarFile").change(function (e) {
+        isDefaultImage = false;
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            $("#avatarPrev").attr("src", e.target.result);
+          };
+          reader.readAsDataURL(file);
         }
       });
+
+      // 기본 이미지 버튼 클릭 시
+      $("#avatarReset").click(function () {
+        isDefaultImage = true;
+        $("#avatarPrev").attr("src", "/assets/img/avatar.jpg");
+        $("#avatarFile").val("");
+      });
+
+      $("#doneBtn").click(function () {
+        const nickname = $("#nickname").val().trim();
+        const file = $("#avatarFile")[0].files[0];
+
+        const formData = new FormData();
+        formData.append("nickname", nickname);
+        formData.append("is_default", isDefaultImage);
+
+        if (file) {
+          formData.append("image", file);
+        }
+
+        $.ajax({
+          type: "POST",
+          url: "/mypage/update_mypage",
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            if (response["result"] === "success") {
+              alert(response["msg"]);
+              window.location.href = "/mypage";
+            } else {
+              alert(response["msg"]);
+            }
+          }
+        });
+      });
     });
-  });
-</script>
+  </script>
 </body>
 
 </html>

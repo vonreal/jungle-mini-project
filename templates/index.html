@@ -34,8 +34,8 @@
             </section>
             {% else %}
             <section class="mission">
-              <span class="countdown" id="challengeTimer" aria-label="챌린지 종료까지 남은 시간"> 챌린지 종료까지 남은
-                시간</span>
+              <span class="countdown" id="challengeTimer" aria-label="챌린지 종료까지"
+                data-end="{{ mission.end_date.strftime('%Y-%m-%dT%H:%M:%S') }}+09:00"></span>
               <h1 id="missionTitle">{{mission.content}}</h1>
               <div class="meta-row">
                 <span id="missionDate">2026.03.05 · 챌린지</span>
@@ -46,7 +46,7 @@
             <section class="section">
               <div class="tabs" id="tabs">
                 <div class="tab active" data-sort="latest" id="LATEST-TAB" onclick="getFeeds('LATEST')">최신순</div>
-                <div class="tab" data-sort="likes" id="LIKE-TAB" onclick="getFeeds('LIKE')">좋아요순</div>
+                <div class="tab" data-sort="likes" id="LIKE-TAB" onclick="getFeeds('LIKE')">좋아요 순</div>
                 <div class="tab" data-sort="comments" id="COMMENT-TAB" onclick="getFeeds('COMMENT')">댓글 많은 순</div>
               </div>
 
@@ -124,49 +124,123 @@
     </div>
   </div>
 
-  <!-- <script src="assets/js/common.js"></script>
-  <script src="assets/js/main.js"></script> -->
-  <!-- <script src="assets/js/mock.js"></script> -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script>
+    // Utility functions
+    const todayK = () => {
+      const d = new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${d.getFullYear()}.${mm}.${dd}`;
+    };
+
     const CURRENT_USER_ID = document.querySelector('meta[name="current-user-id"]').getAttribute('content') || null;
 
     // [Functions]
-    $(document).ready(function () {
+    jQuery(function ($) {
+      const todayText = document.getElementById('todayText');
+      if (todayText) {
+        todayText.textContent = `${todayK()}  ·  오늘`;
+      }
+
+      const timerEl = document.getElementById('challengeTimer');
+      if (timerEl) {
+        const endDate = new Date(timerEl.dataset.end);
+
+        function updateTimer() {
+          const diff = endDate - new Date();
+          if (diff <= 0) {
+            timerEl.textContent = '마감';
+            clearInterval(timerInterval);
+            return;
+          }
+          const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+          const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+          const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+          timerEl.textContent = `챌린지 종료까지 ${h}:${m}:${s}`;
+        }
+
+        updateTimer();
+        const timerInterval = setInterval(updateTimer, 1000);
+      }
+
+      // Scroll to top button functionality
+      const fabTop = document.getElementById('fabTop');
+      const app = document.querySelector('.app');
+
+      function onScroll() {
+        const y = app.scrollTop || window.scrollY || 0;
+        if (y > 260) {
+          fabTop.classList.add('show');
+        } else {
+          fabTop.classList.remove('show');
+        }
+      }
+
+      app.addEventListener('scroll', onScroll);
+      window.addEventListener('scroll', onScroll);
+
+      fabTop.addEventListener('click', () => {
+        if (app.scrollTo) {
+          app.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      // Login CTA functionality
+      const loginCta = document.getElementById('loginCta');
+      const fab = document.getElementById('fab');
+
+      if (fab) {
+        fab.addEventListener('click', (e) => {
+          if (!CURRENT_USER_ID) {
+            e.preventDefault();
+            loginCta.classList.add('show');
+          }
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        if (!loginCta.classList.contains('show')) return;
+        const inside = loginCta.contains(e.target) || e.target === fab;
+        if (!inside) loginCta.classList.remove('show');
+      });
+
+      const ctaGoLogin = document.getElementById('ctaGoLogin');
+      if (ctaGoLogin) {
+        ctaGoLogin.addEventListener('click', () => window.location.href = '/login');
+      }
     });
 
     function deleteFeed(feedId) {
+      if (!confirm('피드를 삭제하시겠습니까?')) return;
       $.ajax({
-        type: 'post',
+        type: 'POST',
         url: '/delete_feed',
-        data: {
-          feedId: feedId,
-        },
+        data: { feedId: feedId },
         success: function (response) {
           if (response['result'] === 'failure') {
             alert(response['msg']);
             return;
           }
           alert(response['msg']);
-          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
+          window.location.reload();
         }
       });
     }
 
     function like(feedId) {
       $.ajax({
-        type: 'post',
+        type: 'POST',
         url: '/like',
-        data: {
-          feedId: feedId,
-        },
+        data: { feedId: feedId },
         success: function (response) {
           if (response['result'] === 'failure') {
             alert(response['msg']);
             return;
           }
           alert(response['msg']);
-          window.location.reload(); // ✅ TODO: 새로고침 -> javascript 처리로 변경필요
+          window.location.reload();
         }
       });
     }
@@ -176,23 +250,24 @@
     }
 
     function getFeeds(orderType) {
+      document.querySelectorAll('#tabs .tab').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(orderType + '-TAB').classList.add('active');
       $.ajax({
-        type: 'post',
+        type: 'POST',
         url: '/feeds',
-        data: {
-          orderType: orderType,
-        },
+        data: { orderType: orderType },
         success: function (response) {
           if (response['result'] === 'failure') {
             alert(response['msg']);
             return;
           }
-          listFeeds(response['feeds'])
+          listFeeds(response['feeds']);
         }
       });
 
       function listFeeds(datas) {
-        $('#feedList').empty();
+        const feedList = document.getElementById('feedList');
+        feedList.innerHTML = '';
 
         for (let i = 0; i < datas.length; i++) {
           data = datas[i];
@@ -227,7 +302,7 @@
              </article >
           `;
 
-          $('#feedList').append(feed_html);
+          feedList.insertAdjacentHTML('beforeend', feed_html);
         }
       }
     }
