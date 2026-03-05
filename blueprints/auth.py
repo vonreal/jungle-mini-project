@@ -30,18 +30,29 @@ def create_id():
     if nickname_dup is not None:
         return jsonify({'result': 'fail', 'msg': "중복된 닉네임 입니다"})
     
-    #아이디,비번,닉네임 정규식 확인
+    # 아이디 정규식 확인 (5~20자, 영문 소문자/숫자/특수기호)
     id_regex = r'^[a-z0-9_-]{5,20}$'
     if not re.match(id_regex, new_id_receive):
-        return jsonify({'result': 'fail', 'msg': "아이디 형식이 올바르지 않습니다."})
+        return jsonify({
+            'result': 'fail', 
+            'msg': "아이디는 5~20자의 영문 소문자, 숫자, 특수기호(_),(-)만 사용 가능합니다."
+        })
 
+    # 비밀번호 정규식 확인 (8~16자, 영문/숫자/특수문자 필수 조합)
     password_regex = r'^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$'
     if not re.match(password_regex, new_password_receive):
-        return jsonify({'result': 'fail', 'msg': "비밀번호 형식이 올바르지 않습니다."})
-    
+        return jsonify({
+            'result': 'fail', 
+            'msg': "비밀번호는 8~16자의 영문, 숫자, 특수문자를 각각 최소 하나씩 포함해야 합니다."
+        })
+
+    # 닉네임 정규식 확인 (1~16자, 영문/한글)
     nickname_regex = r'^[a-zA-Z가-힣]{1,16}$'
     if not re.match(nickname_regex, new_nickname_receive):
-        return jsonify({'result': 'fail', 'msg': "닉네임 형식이 올바르지 않습니다."})
+        return jsonify({
+            'result': 'fail', 
+            'msg': "닉네임은 한글 또는 영문 1~16자로 입력해주세요. (숫자/특수문자 불가)"
+        })
     
 
     #4 비밀번호를 해싱

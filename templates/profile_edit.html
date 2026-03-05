@@ -38,9 +38,10 @@
         </div>
 
         <div class="field" style="margin-top:16px;">
-          <input class="input" id="nickname" placeholder="닉네임" />
+          <input class="input" id="nickname" placeholder="닉네임" value="{{ nickname }}" />
         </div>
       </main>
+      
     </div>
   </div>
 
@@ -49,59 +50,59 @@
   <script src="assets/js/profile_edit.js"></script> -->
 
   <script>
-    $(document).ready(function () {
-      $("#avatarFile").change(function (e) {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            $("#avatarPrev").attr("src", e.target.result); // 선택한 이미지로 미리보기 교체
-          };
-          reader.readAsDataURL(file);
-        }
-      });
+  $(document).ready(function () {
+    let isDefaultImage = false;
 
-      $("#avatarReset").click(function () {
-        $("#avatarPrev").attr("src", "/assets/img/avatar.jpg");
-        $("#avatarFile").val(""); // 파일 선택 초기화
-      });
+    // 이미지 변경 시
+    $("#avatarFile").change(function (e) {
+      isDefaultImage = false;
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          $("#avatarPrev").attr("src", e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-      $("#doneBtn").click(function () {
-        const nickname = $("#nickname").val().trim();
-        const file = $("#avatarFile")[0].files[0];
+    // 기본 이미지 버튼 클릭 시
+    $("#avatarReset").click(function () {
+      isDefaultImage = true;
+      $("#avatarPrev").attr("src", "/assets/img/avatar.jpg");
+      $("#avatarFile").val(""); 
+    });
 
-        if (!nickname) {
-          alert("닉네임을 입력해주세요.");
-          return;
-        }
+    $("#doneBtn").click(function () {
+      const nickname = $("#nickname").val().trim();
+      const file = $("#avatarFile")[0].files[0];
 
-        const formData = new FormData();
-        formData.append("nickname", nickname);
-        if (file) {
-          formData.append("image", file);
-        }
+      const formData = new FormData();
+      formData.append("nickname", nickname);
+      formData.append("is_default", isDefaultImage);
+      
+      if (file) {
+        formData.append("image", file);
+      }
 
-        $.ajax({
-          type: "POST",
-          url: "/mypage/update_mypage",
-          data: formData,
-          processData: false,
-          contentType: false,
-          success: function (response) {
-            if (response["result"] === "success") {
-              alert(response["msg"]);
-              window.location.href = "/mypage"; 
-            } else {
-              alert(response["msg"]);
-            }
-          },
-          error: function () {
-            alert("서버 통신 중 오류가 발생했습니다.");
+      $.ajax({
+        type: "POST",
+        url: "/mypage/update_mypage",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          if (response["result"] === "success") {
+            alert(response["msg"]);
+            window.location.href = "/mypage";
+          } else {
+            alert(response["msg"]);
           }
-        });
+        }
       });
     });
-  </script>
+  });
+</script>
 </body>
 
 </html>

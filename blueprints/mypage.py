@@ -8,44 +8,39 @@ from utils import handle_image, auth_help
 bp = Blueprint('mypage', __name__)
 
 @bp.route('/mypage')
-def show_register():
+def show_mypage():
     user, _ = auth_help.get_user_from_token()
     if user is None:
         return redirect('/login')
     
-    is_login = False
-    if user != None:
-        is_login = True
-
-    username = user["username"]
+    is_login = True
     
+    nickname = user["nickname"]
     
     user_feeds = list(db.feeds.find({'user_id': user["_id"]}).sort('create_date', -1))
-
     feeds_list = []
     total_likes = 0
 
     for f in user_feeds:
-
         total_likes += len(f.get('likes', []))
-
         feeds_list.append({
             'feed_id': str(f['_id']),
-            'feed_img': f.get('image_path', '')
+            'feed_img': f.get('feed_img_path', '') 
         })
 
     feed_total = len(feeds_list)
-
-    profile_img = user.get('profile_img_path')
-
+    profile_img = user.get('profile_img_path', '/assets/img/avatar.jpg')
 
     return render_template('mypage.html',
                             isLogin=is_login,
-                            username=username,
-                            feedTotal= feed_total,
-                            totalLikes = total_likes,
+                            nickname=nickname,
+                            feedTotal=feed_total,
+                            totalLikes=total_likes,
                             profileImg=profile_img,
                             feeds=feeds_list)
+
+
+
 
 @bp.route('/mypage', methods=['GET'])
 def get_mypage():
@@ -116,7 +111,7 @@ def change_pofile_img_path():
     is_default = request.form.get('is_default') == 'true'
 
     if is_default:
-        saved_file_path = 'assets/img/avatar.jpg'
+        saved_file_path = '/assets/img/avatar.jpg'
     elif image_file and image_file.filename != '':
         saved_file_path = handle_image.save_image(request.files, type="profile")
     else:
