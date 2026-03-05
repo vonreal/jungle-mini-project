@@ -69,7 +69,7 @@ def show_feed_page(feed_id):
 
     # [User] img, nickname
     feed = get_user_data(feed, feed['user_id'])
-    feed['profile_img_path'] = "/" + feed['profile_img_path']
+    feed['profile_img_path'] = feed['profile_img_path']
 
     # [Feed] mission, img, upload_at, like, comment
     feed = get_mission_data(feed, feed['mission_id'])
@@ -78,7 +78,7 @@ def show_feed_page(feed_id):
     feed['comment_count'] = len(feed['comments'])
     for comment in feed['comments']:
         comment = get_user_data(comment, comment['user_id'])
-        comment['profile_img_path'] = "/" + comment['profile_img_path']
+        comment['profile_img_path'] = comment['profile_img_path']
         comment['created_date'] = handle_time.display_time(comment['created_date'])
 
     # [Current User]
