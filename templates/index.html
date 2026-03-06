@@ -38,7 +38,7 @@
                 data-end="{{ mission.end_date.strftime('%Y-%m-%dT%H:%M:%S') }}+09:00"></span>
               <h1 id="missionTitle">{{mission.content}}</h1>
               <div class="meta-row">
-                <span id="missionDate">2026.03.05 · 챌린지</span>
+                <span id="missionDate"></span>
                 <span id="missionParticipants">+ {{mission.participants}}명 참여중</span>
               </div>
             </section>
@@ -154,6 +154,11 @@
       const todayText = document.getElementById('todayText');
       if (todayText) {
         todayText.textContent = `${todayK()}  ·  오늘`;
+      }
+
+      const missionDate = document.getElementById('missionDate');
+      if (missionDate) {
+        missionDate.textContent = `${todayK()} · 챌린지`;
       }
 
       const timerEl = document.getElementById('challengeTimer');
