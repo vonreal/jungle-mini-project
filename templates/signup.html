@@ -110,9 +110,9 @@
           return;
         }
 
-        const pwRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
+        const pwRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()\-=_+])[A-Za-z\d~!@#$%^&*()\-=_+]{8,16}$/;
         if (!pwRegex.test(pw1)) {
-          setError("password", "err-password", "8~16자, 영문·숫자·특수문자(@$!%*?&)를 각각 최소 1개 포함해야 합니다.");
+          setError("password", "err-password", "8~16자, 영문·숫자·특수문자(~!@#$%^&*()-=_+)를 각각 최소 1개 포함해야 합니다.");
           return;
         }
 

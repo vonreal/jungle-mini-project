@@ -18,7 +18,7 @@
         <div style="font-weight:900">피드 상세</div>
         <div class="top-actions">
           {% if current_user_id and current_user_id == feed.user_id %}
-          <button class="pill" id="detailMore" onclick="deleteFeed('{{feed._id}}')">⋯</button>
+          <button class="pill" id="detailMore" onclick="deleteFeed('{{feed._id}}')">삭제</button>
           {% endif %}
         </div>
       </header>
